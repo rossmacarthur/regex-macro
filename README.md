@@ -1,5 +1,9 @@
 # regex-macro
 
+[![Crates.io Version](https://img.shields.io/crates/v/regex-macro.svg)](https://crates.io/crates/regex-macro)
+[![Docs.rs Latest](https://img.shields.io/badge/docs.rs-latest-blue.svg)](https://docs.rs/regex-macro)
+[![Build Status](https://img.shields.io/github/workflow/status/rossmacarthur/regex-macro/build/master)](https://github.com/rossmacarthur/regex-macro/actions?query=workflow%3Abuild)
+
 This crate contains a little macro to generate a lazy
 [`Regex`](https://docs.rs/regex/latest/regex/struct.Regex.html) and remove some
 boilerplate when compiling regex expressions.
