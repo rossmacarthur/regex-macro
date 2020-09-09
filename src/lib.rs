@@ -1,9 +1,18 @@
+//! This crate contains a little macro to generate a lazy
+//! [`Regex`](../regex/struct.Regex.html) and remove some boilerplate when
+//! compiling regex expressions.
+
+#[doc(hidden)]
+pub type Regex = regex::Regex;
+#[doc(hidden)]
+pub type LazyRegex = once_cell::sync::OnceCell<Regex>;
+
 /// Generate a static regex.
 #[macro_export]
 macro_rules! regex {
     ($re:expr $(,)?) => {{
-        static RE: ::once_cell::sync::OnceCell<regex::Regex> = ::once_cell::sync::OnceCell::new();
-        RE.get_or_init(|| ::regex::Regex::new($re).unwrap())
+        static RE: $crate::LazyRegex = $crate::LazyRegex::new();
+        RE.get_or_init(|| $crate::Regex::new($re).unwrap())
     }};
 }
 
@@ -11,8 +20,8 @@ macro_rules! regex {
 #[macro_export]
 macro_rules! try_regex {
     ($re:expr $(,)?) => {{
-        static RE: ::once_cell::sync::OnceCell<regex::Regex> = ::once_cell::sync::OnceCell::new();
-        RE.get_or_try_init(|| ::regex::Regex::new($re))
+        static RE: $crate::LazyRegex = $crate::LazyRegex::new();
+        RE.get_or_try_init(|| $crate::Regex::new($re))
     }};
 }
 
