@@ -1,6 +1,7 @@
 # regex-macro
 
-This crate contains a little macro to generate a lazy `Regex` and remove some
+This crate contains a little macro to generate a lazy
+[`Regex`](https://docs.rs/regex/latest/regex/struct.Regex.html) and remove some
 boilerplate when compiling regex expressions.
 
 ## Usage
@@ -16,7 +17,7 @@ let re = regex!("[0-9a-f]+");
 The following errors when given a bad regex.
 
 ```rust
-use regex_macro::regex;
+use regex_macro::try_regex;
 
 let re = try_regex!("[0-9a-f]+").expect("bad regex");
 
