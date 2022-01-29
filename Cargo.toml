@@ -3,16 +3,16 @@ name = "regex-macro"
 version = "0.1.1"
 authors = ["Ross MacArthur <ross@macarthur.io>"]
 edition = "2018"
-description = "A macro to generate a lazy Regex."
-documentation = "https://docs.rs/regex-macro"
+description = "A macro to generate a lazy regex expression"
 readme = "README.md"
-homepage = "https://github.com/rossmacarthur/regex-macro"
 repository = "https://github.com/rossmacarthur/regex-macro"
 license = "MIT OR Apache-2.0"
+keywords = ["regex", "macro", "lazy"]
+categories = ["rust-patterns", "text-processing"]
 include = ["src/lib.rs", "LICENSE-*", "README.md"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-once_cell = "1"
-regex = "1"
+once_cell = "1.0"
+regex = "1.0"
