@@ -10,24 +10,28 @@ boilerplate when compiling regex expressions.
 
 ## Usage
 
-The following panics when given a bad regex.
+Generally you want to avoid compiling a regex multiple times. The `regex`
+crate suggests using `lazy_static` for this but you can also use `once_cell`
+which is what this crate uses. For example:
 
 ```rust
 use regex_macro::regex;
 
 let re = regex!("[0-9a-f]+");
+assert!(re.is_match("1234deadbeef"));
 ```
 
-The following errors when given a bad regex.
+Which is equivalent to the following.
 
 ```rust
-use regex_macro::try_regex;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
-let re = try_regex!("[0-9a-f]+").expect("bad regex");
-
-// or propagate
-
-let re = try_regex!("[0-9a-f]+")?;
+let re = {
+  static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[0-9a-f]+").unwrap());
+  &*RE
+};
+assert!(re.is_match("1234deadbeef"));
 ```
 
 ## License
