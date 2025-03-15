@@ -4,9 +4,9 @@
 //!
 //! # Usage
 //!
-//! Generally you want to avoid compiling a regex multiple times. The `regex`
-//! crate suggests using `lazy_static` for this but you can also use `once_cell`
-//! which is what this crate uses. For example:
+//! Generally you want to avoid compiling a regex multiple times, by using a
+//! static variable to store the compiled regex. The macro does this using
+//! [`std::sync::LazyLock`].
 //!
 //! ```rust
 //! use regex_macro::regex;
@@ -15,19 +15,19 @@
 //! assert!(re.is_match("1234deadbeef"));
 //! ```
 //!
-//! Which is equivalent to the following.
+//! Which is basically equivalent to the following.
 //! ```rust
-//! use once_cell::sync::Lazy;
+//! use std::sync::LazyLock;
 //! use regex::Regex;
 //!
-//! static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[0-9a-f]+").unwrap());
+//! static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[0-9a-f]+").unwrap());
 //! assert!(RE.is_match("1234deadbeef"));
 //! ```
 
 #[doc(hidden)]
 pub type Regex = regex::Regex;
 #[doc(hidden)]
-pub type Lazy = once_cell::sync::Lazy<Regex>;
+pub type Lazy = std::sync::LazyLock<Regex>;
 
 /// Generate a static regex.
 #[macro_export]
