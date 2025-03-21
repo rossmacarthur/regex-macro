@@ -4,37 +4,82 @@
 //!
 //! # Usage
 //!
-//! Generally you want to avoid compiling a regex multiple times, by using a
-//! static variable to store the compiled regex. The macro does this using
-//! [`std::sync::LazyLock`].
+//! Since it is an anti-pattern to compile the same regular expression in a loop
+//! this means for most regex expressions you need to store them in a
+//! [`LazyLock`] in a static. But this can get a bit tiresome with many regex
+//! expressions. This crate provides a [`regex!`] macro that will store the
+//! compiled regex in a global static and return a reference to it.
 //!
-//! ```rust
-//! use regex_macro::regex;
+//! [`LazyLock`]: std::sync::LazyLock
 //!
-//! let re = regex!("[0-9a-f]+");
-//! assert!(re.is_match("1234deadbeef"));
+//! ### Before
+//!
 //! ```
-//!
-//! Which is basically equivalent to the following.
-//! ```rust
 //! use std::sync::LazyLock;
 //! use regex::Regex;
 //!
-//! static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[0-9a-f]+").unwrap());
-//! assert!(RE.is_match("1234deadbeef"));
+//! // only compiled once, by storing in a static
+//! static HEX_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+//!    Regex::new("[0-9a-f]+").expect("invalid regex")
+//! });
+//!
+//! # let my_iter = vec!["deadbeaf", "1234"];
+//! for item in my_iter {
+//!     if HEX_PATTERN.is_match(item) {
+//!        // frobnicate
+//!     }
+//! }
 //! ```
+//!
+//! ### After
+//!
+//! ```
+//! use regex_macro::regex;
+//!
+//! # let my_iter = vec!["deadbeaf", "1234"];
+//! for item in my_iter {
+//!     // this is still only compiled once!
+//!     if regex!("[0-9a-f]+").is_match(item) {
+//!        // frobnicate
+//!     }
+//! }
+//! ```
+//!
+//! Isn't that much nicer?
+//!
+
+use std::sync::LazyLock;
 
 #[doc(hidden)]
-pub type Regex = regex::Regex;
-#[doc(hidden)]
-pub type Lazy = std::sync::LazyLock<Regex>;
+pub use regex::Regex;
 
-/// Generate a static regex.
+/// Convenient type alias for a lazy regex.
+pub type LazyRegex = LazyLock<Regex>;
+
+/// Returns a lazy regex.
+///
+/// # Examples
+///
+/// ```
+/// use regex_macro::{LazyRegex, lazy_regex};
+///
+/// static RE: LazyRegex = lazy_regex!("[0-9a-f]+");
+/// ```
+#[macro_export]
+macro_rules! lazy_regex {
+    ($re:expr $(,)?) => {{
+        $crate::LazyRegex::new(|| $crate::Regex::new($re).expect("invalid regex"))
+    }};
+}
+
+/// Creates a static regex and returns a reference to it.
+///
+/// See the [crate level documentation][crate] for more information.
 #[macro_export]
 macro_rules! regex {
     ($re:expr $(,)?) => {{
-        static RE: $crate::Lazy = $crate::Lazy::new(|| $crate::Regex::new($re).unwrap());
-        $crate::Lazy::force(&RE)
+        static RE: $crate::LazyRegex = $crate::lazy_regex!($re);
+        &RE
     }};
 }
 

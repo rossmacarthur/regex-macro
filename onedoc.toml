@@ -1,0 +1,3 @@
+[links]
+"Regex" = "https://docs.rs/regex/latest/regex/struct.Regex.html"
+"std::sync::LazyLock" = "https://doc.rust-lang.org/std/sync/struct.LazyLock.html"
